@@ -1,0 +1,32 @@
+import React from 'react';
+
+const Login = () => {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
+        <h1 className="text-2xl font-bold mb-6 text-blue-600">dondeAlquiloSF</h1>
+        <p className="text-gray-600 mb-8">Únete a la comunidad de reseñas de alquileres en Santa Fe.</p>
+        
+        <div className="space-y-4">
+          <a 
+            href={`${API_URL}/auth/google`}
+            className="flex items-center justify-center w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          >
+            Continuar con Google
+          </a>
+          
+          <a 
+            href={`${API_URL}/auth/microsoft`}
+            className="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Continuar con Microsoft
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
