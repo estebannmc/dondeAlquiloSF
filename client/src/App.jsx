@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -16,20 +16,23 @@ function App() {
         const response = await api.get('/auth/user');
         if (response.data.success) {
           setUser(response.data.user);
-          // Registrar evento de login exitoso
           logCustomEvent('login_success', { 
             method: response.data.user.proveedor_login,
             user_id: response.data.user.id 
           });
         }
       } catch (error) {
-        console.error("Not authenticated");
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
     fetchUser();
   }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
 
   if (loading) return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
 
@@ -38,8 +41,8 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<Home user={user} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={user ? <Profile user={user} /> : <Login />} />
+          <Route path="/login" element={user ? <Navigate to="/profile" /> : <Login onLogin={handleLogin} />} />
+          <Route path="/profile" element={user ? <Profile user={user} /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </Router>

@@ -1,13 +1,23 @@
 import React from 'react';
 import MessageInbox from '../components/MessageInbox';
-import api from '../utils/api';
 
 const Profile = ({ user }) => {
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-
-  const handleLogout = () => {
-    window.location.href = `${API_URL}/auth/logout`;
+  const handleLogout = async () => {
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/auth/logout`, {
+        credentials: 'include'
+      });
+      window.location.href = '/';
+    } catch (error) {
+      window.location.href = '/';
+    }
   };
+
+  if (!user) {
+    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
+  }
+
+  const initial = user.nombre ? user.nombre.charAt(0).toUpperCase() : '?';
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -31,19 +41,15 @@ const Profile = ({ user }) => {
           <div className="lg:col-span-1">
             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center">
               <div className="w-24 h-24 bg-blue-600 text-white text-4xl flex items-center justify-center rounded-full font-bold mx-auto mb-4 shadow-lg">
-                {user.nombre.charAt(0)}
+                {initial}
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">{user.nombre}</h2>
-              <p className="text-gray-500 mb-6">{user.email}</p>
+              <h2 className="text-2xl font-bold text-gray-800">{user.nombre || 'Usuario'}</h2>
+              <p className="text-gray-500 mb-6">{user.email || 'Sin email'}</p>
               
               <div className="pt-6 border-t text-left space-y-4">
                 <div>
                   <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Proveedor</p>
-                  <p className="text-gray-700 capitalize">{user.proveedor_login}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">ID de Usuario</p>
-                  <p className="text-mono text-[10px] text-gray-400 break-all">{user.id}</p>
+                  <p className="text-gray-700 capitalize">{user.proveedor_login || 'N/A'}</p>
                 </div>
               </div>
             </div>

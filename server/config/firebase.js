@@ -1,20 +1,25 @@
 const admin = require('firebase-admin');
-const dotenv = require('dotenv');
-dotenv.config();
+const path = require('path');
+const fs = require('fs');
 
-// En producción se cargaría desde un archivo JSON o una variable de entorno con el JSON base64
-// Para prototipado rápido asumimos que las credenciales están en FIREBASE_SERVICE_ACCOUNT
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT 
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-  : null;
+let serviceAccount;
 
-if (serviceAccount) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
-} else {
-  console.warn("Firebase Service Account not found. Firestore will not work.");
+const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+if (fs.existsSync(keyPath)) {
+  serviceAccount = require(keyPath);
+} else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 }
 
+if (!serviceAccount) {
+  throw new Error('Firebase service account not found. Create config/serviceAccountKey.json');
+}
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
 const db = admin.firestore();
+db.settings({ timestampsInSnapshots: true });
+
 module.exports = { admin, db };

@@ -4,6 +4,8 @@ const authController = require('../controllers/authController');
 
 router.get('/google', authController.googleAuth);
 router.get('/google/callback', authController.googleAuthCallback);
+router.get('/mock-callback', authController.mockCallback);
+router.get('/mock-login', authController.mockLogin);
 router.get('/microsoft', authController.microsoftAuth);
 router.get('/microsoft/callback', authController.microsoftAuthCallback);
 router.get('/login/failed', authController.loginFailed);
