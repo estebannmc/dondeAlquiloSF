@@ -1,41 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import io from 'socket.io-client';
-import axios from 'axios';
-
-const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:5001');
+import api from '../utils/api';
 
 const MessageInbox = ({ userId }) => {
   const [messages, setMessages] = useState([]);
+  const socketRef = useRef(null);
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   useEffect(() => {
-    fetchMessages();
-    
-    socket.emit('join_room', userId);
+    if (!userId) return;
 
-    socket.on('receive_message', (data) => {
-      setMessages((prev) => [data, ...prev]);
-      // Notificación simple
-      if (Notification.permission === "granted") {
-        new Notification("Nuevo mensaje en dondeAlquiloSF", { body: data.contenido });
-      } else {
-        alert(`Nuevo mensaje: ${data.contenido}`);
-      }
+    socketRef.current = io(API_URL, {
+      reconnection: true,
+      reconnectionAttempts: 5
     });
 
-    return () => {
-      socket.off('receive_message');
-    };
-  }, [userId]);
+    socketRef.current.on('connect', () => {
+      socketRef.current.emit('join_room', userId);
+    });
 
-  const fetchMessages = async () => {
+    socketRef.current.on('receive_message', (data) => {
+      setMessages((prev) => [{ ...data, id: data.id || Date.now() }, ...prev]);
+    });
+
+    fetchMessages();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off('receive_message');
+        socketRef.current.disconnect();
+      }
+    };
+  }, [userId, API_URL]);
+
+  const fetchMessages = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/messages?userId=${userId}`);
+      const response = await api.get('/messages');
       setMessages(response.data);
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  };
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-inner border border-gray-100 overflow-hidden">
@@ -52,8 +57,8 @@ const MessageInbox = ({ userId }) => {
             <p className="text-gray-400 italic">No tienes mensajes aún.</p>
           </div>
         ) : (
-          messages.map((msg, idx) => (
-            <div key={idx} className="flex flex-col">
+          messages.map((msg) => (
+            <div key={msg.id || `${msg.remitente_id}-${msg.fecha?._seconds}`} className="flex flex-col">
               <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${msg.remitente_id === userId ? 'self-end bg-blue-600 text-white rounded-tr-none' : 'self-start bg-white text-gray-800 border border-gray-200 rounded-tl-none'}`}>
                 <p className="text-sm">{msg.contenido}</p>
                 <div className={`text-[10px] mt-1 opacity-70 ${msg.remitente_id === userId ? 'text-right' : 'text-left'}`}>
@@ -61,7 +66,7 @@ const MessageInbox = ({ userId }) => {
                 </div>
               </div>
               <span className={`text-[10px] text-gray-400 mt-1 ${msg.remitente_id === userId ? 'self-end mr-1' : 'self-start ml-1'}`}>
-                {msg.remitente_id === userId ? 'Tú' : `De: ${msg.remitente_id.substring(0, 8)}...`}
+                {msg.remitente_id === userId ? 'Tú' : `De: ${msg.remitente_id?.substring(0, 8)}...`}
               </span>
             </div>
           ))

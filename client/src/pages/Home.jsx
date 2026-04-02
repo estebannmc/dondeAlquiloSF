@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import MapView from '../components/MapView';
 import ReviewForm from '../components/ReviewForm';
@@ -6,6 +7,7 @@ import ReviewList from '../components/ReviewList';
 import { logCustomEvent } from '../firebase';
 
 const Home = ({ user }) => {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -23,25 +25,24 @@ const Home = ({ user }) => {
     }
   };
 
-  const fetchReviews = async (propertyId) => {
+  const fetchReviews = useCallback(async (propertyId) => {
     try {
       const response = await api.get(`/reviews/${propertyId}`);
       setReviews(response.data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     }
-  };
+  }, []);
 
   const handleMapClick = async (latlng) => {
     if (!user) {
-      alert("Debes iniciar sesión para registrar una propiedad.");
-      window.location.href = "/login";
+      navigate("/login");
       return;
     }
     const direccion = prompt("Ingrese la dirección para esta nueva propiedad:");
     if (direccion) {
       try {
-        await api.post('/properties', {
+        const response = await api.post('/properties', {
           direccion,
           latitud: latlng.lat,
           longitud: latlng.lng
@@ -52,7 +53,16 @@ const Home = ({ user }) => {
           user_id: user?.id 
         });
 
-        fetchProperties();
+        const newProperty = {
+          id: response.data.id,
+          direccion,
+          latitud: latlng.lat,
+          longitud: latlng.lng
+        };
+        
+        setProperties(prev => [...prev, newProperty]);
+        setSelectedProperty(newProperty);
+        setReviews([]);
       } catch (error) {
         console.error("Error creating property:", error);
       }
@@ -61,7 +71,9 @@ const Home = ({ user }) => {
 
   const handleReviewSubmit = async (reviewData) => {
     try {
-      await api.post('/reviews', reviewData);
+      console.log('Enviando reseña:', reviewData);
+      const response = await api.post('/reviews', reviewData);
+      console.log('Reseña creada:', response.data);
       
       logCustomEvent('submit_review', { 
         property_id: reviewData.propiedad_id,
@@ -69,13 +81,18 @@ const Home = ({ user }) => {
         user_id: user?.id 
       });
 
-      fetchReviews(reviewData.propiedad_id);
+      alert('¡Reseña publicada exitosamente!');
+      
+      setTimeout(() => {
+        fetchReviews(reviewData.propiedad_id);
+      }, 500);
     } catch (error) {
       console.error("Error submitting review:", error);
+      alert('Error al publicar la reseña: ' + (error.response?.data?.error || error.message));
     }
   };
 
-  const handleMarkerClick = (property) => {
+  const handleMarkerClick = useCallback((property) => {
     setSelectedProperty(property);
     fetchReviews(property.id);
     
@@ -83,7 +100,7 @@ const Home = ({ user }) => {
       property_id: property.id,
       direccion: property.direccion 
     });
-  };
+  }, [fetchReviews]);
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -99,9 +116,9 @@ const Home = ({ user }) => {
             ) : (
               <a href="/profile" className="flex items-center space-x-2 bg-gray-50 px-4 py-2 rounded-lg border hover:bg-white transition">
                 <span className="w-8 h-8 bg-blue-100 text-blue-600 flex items-center justify-center rounded-full font-bold">
-                  {user.nombre.charAt(0)}
+                  {user.nombre ? user.nombre.charAt(0).toUpperCase() : '?'}
                 </span>
-                <span className="text-gray-700 font-medium">{user.nombre}</span>
+                <span className="text-gray-700 font-medium">{user.nombre || 'Usuario'}</span>
               </a>
             )}
           </nav>
@@ -131,7 +148,6 @@ const Home = ({ user }) => {
                   {user ? (
                     <ReviewForm 
                       propertyId={selectedProperty.id} 
-                      userId={user.id} 
                       onReviewSubmit={handleReviewSubmit} 
                     />
                   ) : (
