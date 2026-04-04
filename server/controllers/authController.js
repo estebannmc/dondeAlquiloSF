@@ -1,9 +1,8 @@
 const passport = require('passport');
 
-exports.googleAuth = (req, res, next) => {
-  if (process.env.NODE_ENV === 'development') {
-    return res.redirect('/auth/mock-callback?provider=google');
-  }
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+
+if (process.env.GOOGLE_CLIENT_ID) {
   const GoogleStrategy = require('passport-google-oauth20').Strategy;
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -22,10 +21,21 @@ exports.googleAuth = (req, res, next) => {
     if (!doc.exists) await userRef.set(userData);
     return done(null, userData);
   }));
+}
+
+exports.googleAuth = (req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    return res.redirect('/auth/mock-callback?provider=google');
+  }
   passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
 };
 
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5001";
+exports.googleAuthCallback = (req, res) => {
+  passport.authenticate('google', {
+    successRedirect: CLIENT_URL,
+    failureRedirect: '/auth/login/failed',
+  })(req, res);
+};
 
 exports.mockCallback = (req, res) => {
   const mockUser = {
@@ -49,13 +59,6 @@ exports.mockLogin = (req, res) => {
   };
   req.session.user = mockUser;
   res.json({ success: true, user: mockUser });
-};
-
-exports.googleAuthCallback = (req, res) => {
-  passport.authenticate('google', {
-    successRedirect: CLIENT_URL,
-    failureRedirect: '/auth/login/failed',
-  })(req, res);
 };
 
 exports.microsoftAuth = passport.authenticate('microsoft', { scope: ['user.read'] });

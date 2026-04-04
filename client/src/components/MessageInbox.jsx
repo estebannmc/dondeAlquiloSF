@@ -46,7 +46,7 @@ const MessageInbox = ({ userId }) => {
     <div className="bg-white rounded-xl shadow-inner border border-gray-100 overflow-hidden">
       <div className="bg-gray-50 px-4 py-3 border-b flex justify-between items-center">
         <h3 className="font-bold text-gray-700">Bandeja de Entrada</h3>
-        <span className="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-1 rounded-full">
+        <span className="bg-primary-100 text-primary-600 text-xs font-bold px-2 py-1 rounded-full">
           {messages.length} mensajes
         </span>
       </div>
@@ -59,7 +59,7 @@ const MessageInbox = ({ userId }) => {
         ) : (
           messages.map((msg) => (
             <div key={msg.id || `${msg.remitente_id}-${msg.fecha?._seconds}`} className="flex flex-col">
-              <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${msg.remitente_id === userId ? 'self-end bg-blue-600 text-white rounded-tr-none' : 'self-start bg-white text-gray-800 border border-gray-200 rounded-tl-none'}`}>
+              <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${msg.remitente_id === userId ? 'self-end bg-primary-500 text-white rounded-tr-none' : 'self-start bg-white text-gray-800 border border-gray-200 rounded-tl-none'}`}>
                 <p className="text-sm">{msg.contenido}</p>
                 <div className={`text-[10px] mt-1 opacity-70 ${msg.remitente_id === userId ? 'text-right' : 'text-left'}`}>
                   {msg.fecha && new Date(msg.fecha._seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

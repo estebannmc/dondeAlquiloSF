@@ -20,11 +20,11 @@ const Profile = ({ user }) => {
   const initial = user.nombre ? user.nombre.charAt(0).toUpperCase() : '?';
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       <div className="responsive-container">
         <header className="py-8 flex justify-between items-center">
           <div>
-            <a href="/" className="text-blue-600 font-medium hover:underline flex items-center mb-2">
+            <a href="/" className="text-primary-500 font-medium hover:underline flex items-center mb-2">
               <span className="mr-1">←</span> Volver al Mapa
             </a>
             <h1 className="text-4xl font-extrabold text-gray-900">Mi Perfil</h1>
@@ -40,7 +40,7 @@ const Profile = ({ user }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center">
-              <div className="w-24 h-24 bg-blue-600 text-white text-4xl flex items-center justify-center rounded-full font-bold mx-auto mb-4 shadow-lg">
+              <div className="w-24 h-24 bg-primary-500 text-white text-4xl flex items-center justify-center rounded-full font-bold mx-auto mb-4 shadow-lg">
                 {initial}
               </div>
               <h2 className="text-2xl font-bold text-gray-800">{user.nombre || 'Usuario'}</h2>

@@ -254,7 +254,7 @@ const ReviewForm = ({ propertyId, onReviewSubmit }) => {
 
       <button 
         type="submit" 
-        className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg hover:bg-blue-700 transition"
+        className="w-full bg-primary-500 text-white font-bold py-2.5 rounded-lg hover:bg-primary-600 transition"
       >
         Publicar Reseña
       </button>

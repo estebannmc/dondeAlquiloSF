@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
     "axios": "^1.4.0",
     "firebase": "^12.11.0",
     "leaflet": "^1.9.4",
@@ -21,9 +22,8 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.2",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
     "tailwindcss": "^3.3.0"
   },
   "browserslist": {

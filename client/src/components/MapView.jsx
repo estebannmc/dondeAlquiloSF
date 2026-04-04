@@ -3,7 +3,8 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-map
 
 const containerStyle = {
   width: '100%',
-  height: '500px'
+  height: '100%',
+  minHeight: '400px'
 };
 
 const center = {
@@ -53,7 +54,7 @@ const MapView = ({ properties, onMapClick, onMarkerClick }) => {
   }
 
   return (
-    <div className="map-view rounded-xl overflow-hidden shadow-lg border-4 border-white">
+    <div className="map-view rounded-xl overflow-hidden shadow-lg border-4 border-white h-full">
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
@@ -78,7 +79,7 @@ const MapView = ({ properties, onMapClick, onMarkerClick }) => {
             onCloseClick={() => setSelectedProperty(null)}
           >
             <div className="p-1">
-              <strong className="text-blue-600">{selectedProperty.direccion}</strong>
+              <strong className="text-primary-500">{selectedProperty.direccion}</strong>
               <p className="text-xs text-gray-500">Haz clic para ver reseñas</p>
             </div>
           </InfoWindow>

@@ -19,15 +19,15 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-sm w-full text-center">
-        <h1 className="text-2xl font-bold mb-6 text-blue-600">dondeAlquiloSF</h1>
+        <h1 className="text-2xl font-semibold mb-6 text-primary-700">¿Dónde Alquilo?</h1>
         <p className="text-gray-600 mb-8">Únete a la comunidad de reseñas de alquileres en Santa Fe.</p>
         
         <div className="space-y-4">
           <button 
             onClick={handleDemoLogin}
-            className="flex items-center justify-center w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
             Usuario Demo
           </button>
@@ -50,7 +50,7 @@ const Login = ({ onLogin }) => {
           
           <a 
             href={`${API_URL}/auth/microsoft`}
-            className="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center w-full px-4 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
             Continuar con Microsoft
           </a>
